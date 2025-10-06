@@ -1,7 +1,6 @@
 import asyncio
 from playwright.async_api import async_playwright
 from app.schemas.news import NewsSchema
-from app.db.session import news_collection
 
 
 async def scrape(page):
