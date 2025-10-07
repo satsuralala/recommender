@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.db.session import startup_db_client
-from app.api import news
+from backend.app.api.v1 import news
 
 app = FastAPI(title="News API")
 
