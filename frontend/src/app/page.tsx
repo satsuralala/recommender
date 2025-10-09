@@ -1,9 +1,15 @@
-import { getAllArticles } from "@/lib/articles";
+"use client";
 import { ArticleCard } from "@/components/article-card";
 import { Header } from "@/components/header";
+import { Article, getAllArticles } from "@/lib/articles";
+import { useEffect, useState } from "react";
 
 export default function HomePage() {
-  const articles = getAllArticles();
+  const [articles, setArticles] = useState<Article[]>([]);
+
+  useEffect(() => {
+    getAllArticles().then(setArticles).catch(console.error);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -20,9 +26,9 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {articles.map((article) => (
-            <ArticleCard key={article.id} article={article} />
+            <ArticleCard key={article._id} article={article} />
           ))}
         </div>
       </main>

@@ -1,25 +1,20 @@
-import { notFound } from "next/navigation";
+"use client";
+import { notFound, useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { getArticleById, getAllArticles } from "@/lib/articles";
+import { Article, getArticle } from "@/lib/articles";
 import { Header } from "@/components/header";
 import { LikeDislikeButtons } from "@/components/like-dislike-buttons";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 
-export function generateStaticParams() {
-  const articles = getAllArticles();
-  return articles.map((article) => ({
-    id: article.id,
-  }));
-}
-
-export default function ArticlePage({ params }: { params: { id: string } }) {
-  const article = getArticleById(params.id);
-
-  if (!article) {
-    notFound();
-  }
+export default function ArticlePage() {
+  const [article, setArticle] = useState<Article>();
+  const params = useParams();
+  useEffect(() => {
+    getArticle(String(params?.id)).then(setArticle).catch(console.error);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -38,25 +33,27 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
 
         <article className="max-w-4xl mx-auto">
           <div className="mb-8">
-            <span className="text-sm font-medium text-primary uppercase tracking-wider">
-              {article.category}
-            </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-foreground mt-4 mb-6 text-balance leading-tight">
-              {article.title}
+            <h1 className="text-4xl font-serif font-bold text-foreground mt-4 mb-6 text-balance leading-tight">
+              {article?.title}
             </h1>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span className="font-medium text-foreground">
-                Зохиогч: {article.author}
+            <div className="flex justify-between">
+              <span className="text-sm font-medium text-primary uppercase tracking-wider">
+                {article?.category}
               </span>
-              <span>•</span>
-              <span>{article.publishedDate}</span>
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">
+                  Зохиогч: {article?.author}
+                </span>
+                <span>•</span>
+                {/* <span>{article?.published_at}</span> */}
+              </div>
             </div>
           </div>
 
           <div className="relative aspect-[16/9] mb-12 rounded-lg overflow-hidden">
             <Image
-              src={article.mainImage || "/placeholder.svg"}
-              alt={article.title}
+              src={article?.image || "/placeholder.svg"}
+              alt={String(article?._id)}
               fill
               className="object-cover"
               priority
@@ -64,7 +61,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
           </div>
 
           <div className="prose prose-lg max-w-none mb-12">
-            {article.content.split("\n\n").map((paragraph, index) => (
+            {article?.content.split("\n\n").map((paragraph, index) => (
               <p
                 key={index}
                 className="text-foreground leading-relaxed mb-6 text-pretty"

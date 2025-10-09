@@ -1,13 +1,32 @@
+# app/main.py
 from fastapi import FastAPI
-from app.db.session import startup_db_client
-from backend.app.api.v1 import news
+from fastapi.middleware.cors import CORSMiddleware
+from app.db.init_db import init_db
+from app.routes.route import router as news_router
 
-app = FastAPI(title="News API")
+app = FastAPI(title="Chimege News Management API")
+
+
+origins = [
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")
-def startup_event():
-    startup_db_client()
+async def on_startup():
+    await init_db()
+
+app.include_router(news_router)
 
 
-app.include_router(news.router, prefix="/news", tags=["news"])
+@app.get("/")
+async def root():
+    return {"message": "Welcome"}
